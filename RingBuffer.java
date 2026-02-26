@@ -1,9 +1,9 @@
 public class RingBuffer {
 
-  private Integer[] buffer;
+  private final Integer[] buffer;
   private final long[] sequences;
-  private int size;
-  private int writeSequence = 0;
+  private final int size;
+  private long writeSequence = 0;
 
   
  
@@ -17,7 +17,7 @@ public class RingBuffer {
     }
   }
  
-  public void write(int value) {
+  public synchronized void write(int value) {
     long sequence = writeSequence;
         int index = (int) (sequence % size);
 
@@ -28,7 +28,7 @@ public class RingBuffer {
 
   }
 
-  public Integer read(int sequence) {
+  public synchronized Integer read(long sequence) {
     int index = (int) (sequence % size);
 
     if (sequences[index] != sequence) {
@@ -39,7 +39,7 @@ public class RingBuffer {
 
   }
 
-  public int getWriteSequence() {
+  public synchronized long getWriteSequence() {
     return writeSequence;
   }
 
@@ -47,7 +47,7 @@ public class RingBuffer {
     return size;
   }
  
-  public void print() {
+  public synchronized void print() {
     System.out.println("This is our buffer now: " + java.util.Arrays.toString(buffer));
     System.out.println("w: " + writeSequence);
 
