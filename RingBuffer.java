@@ -1,14 +1,16 @@
 public class RingBuffer {
-  private int[] buffer;
+
+  private Integer[] buffer;
+  private final long[] sequences;
   private int size;
-  private int writeIndex;
-  private int writeCount;
+  private int writeSequence = 0;
+
+  
  
   public RingBuffer(int size) {
-    this.buffer = new int[size];
+    this.buffer = new Integer[size];
+    this.sequences = new long[size];
     this.size = size;
-    this.writeIndex = 0;
-    this.writeCount = 0;
  
     for (int i = 0; i < size; i++) {
       buffer[i] = 0;
@@ -16,32 +18,40 @@ public class RingBuffer {
   }
  
   public void write(int value) {
-    buffer[writeIndex] = value;
-    writeIndex++;
+    long sequence = writeSequence;
+        int index = (int) (sequence % size);
 
-    if (writeIndex == size) {
-      writeIndex = 0;
-    }
- 
-    if (writeCount == size) {
-      writeCount = size;
-    } else {
-      writeCount++;
-    }
+        buffer[index] = value;
+        sequences[index] = sequence;
+
+        writeSequence++;
+
   }
 
-  public int read(int index) {
-    if (index < 0 || index >= writeCount) {
-      throw new IndexOutOfBoundsException("Index: " + index + ", Write Count: " + writeCount);
+  public Integer read(int sequence) {
+    int index = (int) (sequence % size);
+
+    if (sequences[index] != sequence) {
+      return null; // overwritten or not written yet
     }
-    return buffer[index];
+
+    return (Integer) buffer[index];
+
+  }
+
+  public int getWriteSequence() {
+    return writeSequence;
+  }
+
+  public int getSize() {
+    return size;
   }
  
   public void print() {
     System.out.println("This is our buffer now: " + java.util.Arrays.toString(buffer));
-    System.out.println("w: " + writeIndex);
+    System.out.println("w: " + writeSequence);
 
-    System.out.println("Write count: " + writeCount);
+    System.out.println("Write count: " + writeSequence);
   }
  
 }
