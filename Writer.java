@@ -1,6 +1,6 @@
 public class Writer {
-    private RingBuffer ringBuffer;
-    private String name;
+    private final RingBuffer ringBuffer;
+    private final String name;
 
     public Writer(String name, RingBuffer ringBuffer) {
         this.name = name;

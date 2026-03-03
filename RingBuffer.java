@@ -8,50 +8,47 @@ public class RingBuffer {
   
  
   public RingBuffer(int size) {
+    if (size <= 0) {
+      throw new IllegalArgumentException("Buffer size must be greater than 0");
+    }
+
     this.buffer = new Integer[size];
     this.sequences = new long[size];
     this.size = size;
  
     for (int i = 0; i < size; i++) {
-      buffer[i] = 0;
+      sequences[i] = -1;
     }
   }
  
-  public synchronized void write(int value) {
+  public void write(int value) {
     long sequence = writeSequence;
-        int index = (int) (sequence % size);
+    int index = (int) (sequence % size);
 
-        buffer[index] = value;
-        sequences[index] = sequence;
+    buffer[index] = value;
+    sequences[index] = sequence;
 
-        writeSequence++;
+    writeSequence++;
 
   }
 
-  public synchronized Integer read(long sequence) {
+  public Integer read(long sequence) {
     int index = (int) (sequence % size);
 
     if (sequences[index] != sequence) {
       return null; // overwritten or not written yet
     }
 
-    return (Integer) buffer[index];
+    return buffer[index];
 
   }
 
-  public synchronized long getWriteSequence() {
+  public long getWriteSequence() {
     return writeSequence;
   }
 
   public int getSize() {
     return size;
   }
- 
-  public synchronized void print() {
-    System.out.println("This is our buffer now: " + java.util.Arrays.toString(buffer));
-    System.out.println("w: " + writeSequence);
 
-    System.out.println("Write count: " + writeSequence);
-  }
- 
 }

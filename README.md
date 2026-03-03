@@ -22,7 +22,7 @@ Key behavior:
 - Owns global write sequence (`writeSequence`).
 - Handles write placement with modulo indexing.
 - Validates whether a requested sequence is still available.
-- Uses synchronized methods for thread-safe access to shared state.
+- Implements deterministic ring-buffer behavior in a simple single-threaded model.
 
 ### `Writer`
 
@@ -38,7 +38,8 @@ Key behavior:
 ### `Main`
 
 - Entry point for running the program.
-- Currently a placeholder and can be extended with a scenario to demonstrate writer/reader interactions.
+- Demonstrates one writer with two readers at different speeds.
+- Shows independent reader progression and overwrite behavior when capacity is exceeded.
 
 ## UML Class Diagram
 
@@ -88,5 +89,5 @@ To validate ring-buffer behavior, add a short scenario in `Main.main` that:
 
 ## Notes
 
-- Current implementation is thread-safe for shared buffer state through synchronization.
-- Single-writer usage is expected by design (`Writer` role), while strict runtime enforcement in `RingBuffer` can be added as a next improvement.
+- Implementation is intentionally single-threaded for clarity of assignment behavior.
+- One writer object should be used as the producer for each `RingBuffer` instance.
