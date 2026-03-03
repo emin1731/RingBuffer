@@ -4,6 +4,7 @@ public class RingBuffer {
   private final long[] sequences;
   private final int size;
   private long writeSequence = 0;
+  private String writerId;
 
   
  
@@ -20,8 +21,29 @@ public class RingBuffer {
       sequences[i] = -1;
     }
   }
+
+  public void registerWriter(String writerName) {
+    if (writerName == null || writerName.isBlank()) {
+      throw new IllegalArgumentException("Writer name must not be null or blank");
+    }
+
+    if (writerId == null) {
+      writerId = writerName;
+      return;
+    }
+
+    throw new IllegalStateException("Only one writer is allowed per RingBuffer (owner: " + writerId + ")");
+  }
  
-  public void write(int value) {
+  public void write(int value, String writerName) {
+    if (writerId == null) {
+      throw new IllegalStateException("Writer is not registered for this RingBuffer");
+    }
+
+    if (!writerId.equals(writerName)) {
+      throw new IllegalStateException("Write rejected: this RingBuffer already has a different writer");
+    }
+
     long sequence = writeSequence;
     int index = (int) (sequence % size);
 
