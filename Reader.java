@@ -1,17 +1,19 @@
 public class Reader {
 
-    private RingBuffer ringBuffer;
-    private String name;
-    private long readSequence;
+    private RingBuffer ringBuffer; // Reference to the shared RingBuffer instance
+    private String name; // Name of the reader for identification in logs
+    private long readSequence; // Sequence number for the next read operation, initialized to the current write sequence of the ring buffer
 
+
+    // Constructor initializes the reader with a name, reference to the ring buffer, and sets the initial read sequence to the current write sequence of the ring buffer.
     public Reader(String name, RingBuffer ringBuffer) {
         this.name = name;
         this.ringBuffer = ringBuffer;
-        this.readSequence = ringBuffer.getWriteSequence(); // Start reading from the current write 
+        this.readSequence = ringBuffer.getWriteSequence(); // Start reading from the current write sequence
     }
 
-    public synchronized Integer read() {
-        Integer value = this.ringBuffer.read(this.readSequence);
+    public synchronized Long read() {
+        Long value = this.ringBuffer.read(this.readSequence);
         long writeSequence = ringBuffer.getWriteSequence();
         long oldestAvailableIndex = Math.max(0, writeSequence - ringBuffer.getSize());
 
@@ -36,6 +38,7 @@ public class Reader {
         return value;
     }
 
+    // Getter for the reader's name, used for logging purposes.
     public String getName() {
         return name;
     }
