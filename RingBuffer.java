@@ -30,6 +30,7 @@ public class RingBuffer {
 
   // The write method adds a new value to the buffer at the position determined by the current write sequence.
   public synchronized void write(long value) {
+    
 
     int index = (int) (writeSequence % size);
 

@@ -2,17 +2,17 @@
 
 ## Project overview
 
-This project implements a fixed-size ring buffer where one writer appends values and multiple readers consume values independently.
+This project implements a fixed-size ring buffer where values are written into a shared buffer and multiple readers consume values independently.
 
 Key behavior:
 
 - The Ring Buffer has a fixed capacity N.
-- Only one writer is allowed to call write().
+- Writes happen through `RingBuffer.write(long value)`.
 - There may be multiple readers, each reading from the same buffer.
 - Each reader must have its own reading position.
 - Reading by one reader must not remove the item for other readers.
-- If the buffer becomes full, the writer is allowed to overwrite the oldest data.
-- In this case, slow readers may miss some items.
+- If the buffer becomes full, new writes overwrite the oldest data.
+- In this case, slow readers may miss some items and continue from the oldest currently available sequence.
 
 ## Design and responsibilities
 
@@ -24,21 +24,17 @@ Key behavior:
 - Validates whether a requested sequence is still available.
 - Implements deterministic ring-buffer behavior in a simple single-threaded model.
 
-### `Writer`
-
-- Represents the producer role.
-- Sends values into `RingBuffer` through `write(int value)`.
-
 ### `Reader`
 
 - Represents one consumer with an independent cursor (`readSequence`).
 - Reads from `RingBuffer` by sequence.
-- Detects missed/overwritten data (`null` read) and catches up to the oldest currently available sequence.
+- If a reader falls behind, it is advanced to the oldest currently available sequence before reading.
+- Returns `null` when no new data is currently available.
 
 ### `Main`
 
 - Entry point for running the program.
-- Demonstrates one writer with two readers at different speeds.
+- Demonstrates writes plus two readers at different speeds.
 - Shows independent reader progression and overwrite behavior when capacity is exceeded.
 
 ## UML Class Diagram
@@ -65,7 +61,7 @@ Diagram source: [Miro board](https://miro.com/app/board/uXjVG8bkPB0=/?share_link
 2. Compile:
 
 ```bash
-javac Main.java RingBuffer.java Writer.java Reader.java
+javac Main.java RingBuffer.java Reader.java
 ```
 
 3. Run:
@@ -79,15 +75,15 @@ java Main
 To validate ring-buffer behavior, add a short scenario in `Main.main` that:
 
 1. Creates one `RingBuffer` with small size (for example `3`).
-2. Creates one `Writer` and at least two `Reader` instances.
+2. Creates at least two `Reader` instances.
 3. Writes more than capacity (for example 5-6 values).
 4. Reads at different speeds from readers.
 5. Observes that:
    - Readers progress independently.
    - Reading by one reader does not remove values for another.
-   - Slow readers receive `null` after overwrite and then catch up.
+   - Slow readers skip missed overwritten values and continue from currently available data.
 
 ## Notes
 
 - Implementation is intentionally single-threaded for clarity of assignment behavior.
-- One writer object should be used as the producer for each `RingBuffer` instance.
+- The current codebase does not define a separate `Writer` class; writes are invoked directly on `RingBuffer`.
