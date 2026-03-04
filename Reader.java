@@ -13,7 +13,6 @@ public class Reader {
     }
 
     public synchronized Long read() {
-        Long value = this.ringBuffer.read(this.readSequence);
         long writeSequence = ringBuffer.getWriteSequence();
         long oldestAvailableIndex = Math.max(0, writeSequence - ringBuffer.getSize());
 
@@ -22,6 +21,8 @@ public class Reader {
         if(readSequence < oldestAvailableIndex) {
             readSequence = oldestAvailableIndex;
         }
+
+        Long value = this.ringBuffer.read(this.readSequence);
 
         // case: reader is trying to read data that has not been written yet
         if(readSequence >= writeSequence) {
