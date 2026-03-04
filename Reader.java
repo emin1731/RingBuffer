@@ -22,12 +22,13 @@ public class Reader {
             readSequence = oldestAvailableIndex;
         }
 
-        Long value = this.ringBuffer.read(this.readSequence);
-
+        
         // case: reader is trying to read data that has not been written yet
         if(readSequence >= writeSequence) {
             return null;
         }
+        
+        Long value = this.ringBuffer.read(this.readSequence);
         
         // case: reader is trying to read data that has been overwritten
         if(value == null) {

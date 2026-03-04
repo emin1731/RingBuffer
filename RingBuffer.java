@@ -3,7 +3,7 @@ public class RingBuffer {
   private final long[] buffer; // fixed-size array to hold the data
   private final long[] sequences; // parallel array to track the sequence number of each slot in the buffer
   private final long size; // capacity of the buffer
-  private long writeSequence = 0; // global sequence number for the next write operation
+  private volatile long writeSequence = 0; // global sequence number for the next write operation
 
   
  
@@ -29,7 +29,7 @@ public class RingBuffer {
 
 
   // The write method adds a new value to the buffer at the position determined by the current write sequence.
-  public void write(long value) {
+  public synchronized void write(long value) {
 
     int index = (int) (writeSequence % size);
 
